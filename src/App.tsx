@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { 
   Rocket, 
   Target, 
@@ -22,7 +22,9 @@ import {
   Settings,
   Zap,
   ShoppingBag,
-  Coins
+  Coins,
+  Menu,
+  X
 } from "lucide-react";
 
 export default function App() {
@@ -41,6 +43,21 @@ export default function App() {
 
   const [view, setView] = useState("home"); // "home", "mall", or "lotto"
   const [activeCategory, setActiveCategory] = useState("All");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [lottoNumbers, setLottoNumbers] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (view === "lotto") {
+      const generateNumbers = () => {
+        const numbers = new Set<number>();
+        while (numbers.size < 7) {
+          numbers.add(Math.floor(Math.random() * 36) + 1);
+        }
+        return Array.from(numbers);
+      };
+      setLottoNumbers(generateNumbers());
+    }
+  }, [view]);
 
   const products = [
     {
@@ -104,21 +121,71 @@ export default function App() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b-2 border-black">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("home")}>
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => (setView("home"), setIsMenuOpen(false))}>
             <div className="w-10 h-10 bg-lego-red border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-white font-black text-xl">
               A
             </div>
             <span className="font-display font-black text-2xl tracking-tighter uppercase">Angel Lotto</span>
           </div>
+
+          {/* Desktop Menu */}
           <div className="hidden md:flex gap-8 font-bold text-sm tracking-widest uppercase">
             <button onClick={() => setView("home")} className={`hover:text-lego-blue ${view === "home" ? "text-lego-blue underline underline-offset-4" : ""}`}>Platform</button>
             <button onClick={() => setView("lotto")} className={`hover:text-lego-red ${view === "lotto" ? "text-lego-red underline underline-offset-4" : ""}`}>ALotto</button>
             <button onClick={() => setView("mall")} className={`hover:text-lego-yellow ${view === "mall" ? "text-lego-yellow underline underline-offset-4" : ""}`}>Angel Mall</button>
           </div>
-          <button className="hidden sm:block lego-button py-2 px-6 text-sm">
-            Contact
-          </button>
+
+          <div className="flex items-center gap-4">
+            <button className="hidden sm:block lego-button py-2 px-6 text-sm">
+              Contact
+            </button>
+            
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden w-10 h-10 border-2 border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-6 h-6 text-black" /> : <Menu className="w-6 h-6 text-black" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-20 left-0 right-0 bg-white border-b-2 border-black md:hidden px-6 py-8 flex flex-col gap-6 font-black uppercase tracking-widest shadow-xl"
+            >
+              <button 
+                onClick={() => (setView("home"), setIsMenuOpen(false))} 
+                className={`text-left text-lg ${view === "home" ? "text-lego-blue" : ""}`}
+              >
+                Platform
+              </button>
+              <button 
+                onClick={() => (setView("lotto"), setIsMenuOpen(false))} 
+                className={`text-left text-lg ${view === "lotto" ? "text-lego-red" : ""}`}
+              >
+                ALotto
+              </button>
+              <button 
+                onClick={() => (setView("mall"), setIsMenuOpen(false))} 
+                className={`text-left text-lg ${view === "mall" ? "text-lego-yellow" : ""}`}
+              >
+                Angel Mall
+              </button>
+              <button 
+                className="lego-button w-full text-center py-4 bg-lego-yellow text-black"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact Us
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {view === "home" ? (
@@ -433,40 +500,43 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-6">
             {/* Header with Animation */}
             <div className="text-center mb-20">
+              <div className="inline-block px-6 py-2 bg-lego-red text-white font-black mb-4 border-2 border-black">
+                제1221회 당첨 번호 (2026.04.25)
+              </div>
               <h2 className="font-display font-black text-6xl md:text-8xl mb-8 uppercase italic text-lego-yellow">
-                ALotto <span className="text-white">Live</span>
+                ALotto <span className="text-white">Winner</span>
               </h2>
               <div className="flex flex-wrap justify-center gap-4">
-                {[1, 2, 3, 4, 5, 6].map((_, i) => (
+                {[6, 13, 18, 28, 30, 36].map((num, i) => (
                   <motion.div
                     key={i}
                     animate={{ 
-                      y: [0, -20, 0],
-                      rotate: [0, 360],
-                      backgroundColor: ["#E3000B", "#0055BF", "#FFD500", "#009639"]
+                      y: [0, -10, 0],
                     }}
                     transition={{ 
                       repeat: Infinity, 
                       duration: 2 + i * 0.2,
                       ease: "easeInOut"
                     }}
-                    className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-black flex items-center justify-center text-2xl font-black shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+                    className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-black flex items-center justify-center text-3xl font-black bg-lego-blue text-white shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
                   >
-                    {Math.floor(Math.random() * 45) + 1}
+                    {num}
                   </motion.div>
                 ))}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black border-4 border-lego-red flex items-center justify-center text-2xl font-black text-lego-red shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black border-4 border-lego-red flex items-center justify-center text-3xl font-black text-lego-red shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]">
                   +
                 </div>
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
+                  animate={{ scale: [1, 1.1, 1] }}
                   transition={{ repeat: Infinity, duration: 1 }}
-                  className="w-16 h-16 sm:w-20 sm:h-20 bg-lego-red border-4 border-black flex items-center justify-center text-2xl font-black shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+                  className="w-16 h-16 sm:w-20 sm:h-20 bg-lego-red border-4 border-black flex items-center justify-center text-3xl font-black text-white shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
                 >
-                  7
+                  9
                 </motion.div>
               </div>
-              <p className="mt-8 text-xl font-black text-slate-400">이번주 예상 당첨 번호 실시간 시뮬레이션</p>
+              <p className="mt-12 text-2xl font-black text-white bg-white/10 inline-block px-10 py-4 border-2 border-dashed border-white/20">
+                1등 당첨 번호: 6, 13, 18, 28, 30, 36 + 보너스 9
+              </p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
@@ -617,20 +687,20 @@ export default function App() {
                   </div>
                   <div className="p-8 flex flex-col flex-grow">
                     <div className="text-xs font-black uppercase tracking-widest text-lego-blue mb-3">{product.category}</div>
-                    <h4 className="font-black text-2xl mb-6 leading-tight text-slate-900">{product.name}</h4>
+                    <h4 className="font-black text-xl sm:text-2xl mb-6 leading-tight text-slate-900 line-clamp-2 min-h-[3rem] sm:min-h-[3.5rem]">{product.name}</h4>
                     
                     <div className="space-y-4 mb-8 flex-grow">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="flex items-center gap-2 font-black text-slate-400 uppercase tracking-tighter">/ Cash Payment</span>
-                        <span className="font-black text-lg text-slate-900">₩{product.price}</span>
+                      <div className="flex flex-col gap-1 items-start text-sm">
+                        <span className="flex items-center gap-2 font-black text-slate-400 uppercase tracking-tighter whitespace-nowrap">/ Cash Payment</span>
+                        <span className="font-black text-lg text-slate-900 whitespace-nowrap px-1">₩{product.price}</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm p-4 bg-lego-yellow/10 border-2 border-black">
-                        <span className="flex items-center gap-2 font-black uppercase tracking-tighter text-slate-900"><Ticket className="w-4 h-4 text-black"/> / Wallet Points</span>
-                        <span className="font-black text-lg text-lego-red">{product.points}</span>
+                      <div className="flex flex-col gap-1 items-start text-sm p-3 sm:p-4 bg-lego-yellow/10 border-2 border-black">
+                        <span className="flex items-center gap-2 font-black uppercase tracking-tighter text-slate-900 whitespace-nowrap"><Ticket className="w-4 h-4 text-black shrink-0"/> / Wallet Points</span>
+                        <span className="font-black text-lg text-lego-red whitespace-nowrap px-1">{product.points}</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm p-4 bg-lego-blue/10 border-2 border-black">
-                        <span className="flex items-center gap-2 font-black text-lego-blue uppercase tracking-tighter"><Zap className="w-4 h-4"/> / NFT Balance</span>
-                        <span className="font-black text-lg text-lego-blue">{product.nft}</span>
+                      <div className="flex flex-col gap-1 items-start text-sm p-3 sm:p-4 bg-lego-blue/10 border-2 border-black">
+                        <span className="flex items-center gap-2 font-black text-lego-blue uppercase tracking-tighter whitespace-nowrap"><Zap className="w-4 h-4 shrink-0"/> / NFT Balance</span>
+                        <span className="font-black text-lg text-lego-blue whitespace-nowrap px-1">{product.nft}</span>
                       </div>
                     </div>
 
