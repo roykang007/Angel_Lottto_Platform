@@ -1,0 +1,53 @@
+@font-face {
+  font-family: 'S-CoreDream';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'S-CoreDream';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'S-CoreDream';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-9Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --color-lego-red: #E3000B;
+  --color-lego-blue: #0055BF;
+  --color-lego-yellow: #FFD500;
+  --color-lego-green: #009639;
+  
+  --font-sans: "S-CoreDream", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "S-CoreDream", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 overflow-x-hidden;
+  }
+}
+
+.lego-card {
+  @apply relative border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all;
+}
+
+.lego-card:hover {
+  @apply translate-x-[2px] translate-y-[2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)];
+}
+
+.lego-button {
+  @apply px-8 py-4 bg-lego-yellow border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold text-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all;
+}
+
+.lego-dot {
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
